@@ -1,0 +1,151 @@
+package com.onfido.qa.webdriver;
+
+
+import com.onfido.qa.webdriver.backend.Backend;
+import com.onfido.qa.webdriver.backend.LocalBackend;
+import com.onfido.qa.webdriver.backend.RemoteBackend;
+import net.lightbody.bmp.BrowserMobProxyServer;
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.logging.Level;
+
+import static org.openqa.selenium.logging.LogType.BROWSER;
+import static org.openqa.selenium.logging.LogType.CLIENT;
+import static org.openqa.selenium.logging.LogType.DRIVER;
+import static org.openqa.selenium.logging.LogType.PERFORMANCE;
+import static org.openqa.selenium.logging.LogType.PROFILER;
+import static org.openqa.selenium.logging.LogType.SERVER;
+
+public abstract class WebTest {
+
+    private static final InheritableThreadLocal<Backend> threadBackend = new InheritableThreadLocal<>();
+
+    private static final Logger log = LoggerFactory.getLogger(WebTest.class);
+
+
+    /**
+     * @return d the Webdriver instance
+     */
+    public static Driver d() {
+        var backend = threadBackend.get();
+
+        if (backend == null) {
+            return null;
+        }
+
+        return backend.getDriver();
+    }
+
+    public static BrowserMobProxyServer proxy() {
+        var backend = threadBackend.get();
+
+        if (backend == null) {
+            return null;
+        }
+
+        return backend.getProxyServer();
+    }
+
+    protected abstract Properties properties();
+
+    protected abstract void extendCapabilities(DesiredCapabilities capabilities);
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod(Method method, ITestContext context) throws Exception {
+
+        try {
+            var properties = this.properties();
+            var local = Boolean.parseBoolean(properties.getProperty("local", "false"));
+
+            var capabilities = createCapabilitiesFromProperties(properties);
+            extendCapabilities(capabilities);
+
+            var backend = local ? new LocalBackend(capabilities, properties) : new RemoteBackend(capabilities, properties);
+
+            threadBackend.set(backend);
+
+            setWindowSize(backend, properties.getProperty("windowSize"));
+
+        } catch (Exception t) {
+            log.error("[Thread {}]. Error in beforeMethod for Test '{}.{}'", Thread.currentThread().getId(), method.getDeclaringClass()
+                                                                                                                   .getSimpleName(), method.getName());
+            throw t;
+        }
+    }
+
+    private DesiredCapabilities createCapabilitiesFromProperties(Properties properties) {
+        var capabilities = new DesiredCapabilities();
+
+        capabilities.setBrowserName(properties.getProperty("browser", null));
+        capabilities.setPlatform(Platform.fromString(properties.getProperty("platform", "ANY")));
+
+        setupLoggingPreferences(properties, capabilities);
+
+        return capabilities;
+    }
+
+    private void setupLoggingPreferences(Properties properties, DesiredCapabilities capabilities) {
+        var loggingPreferences = new LoggingPreferences();
+        var logTypes = Arrays.asList(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
+
+        logTypes.forEach(logType -> {
+            loggingPreferences.enable(logType, Level.parse(properties.getProperty("log." + logType, "ALL")));
+        });
+
+        capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
+    }
+
+    private void setWindowSize(Backend backend, String windowSize) {
+
+        if (StringUtils.isEmpty(windowSize)) {
+            return;
+        }
+
+        var split = windowSize.split(",");
+        var dimensions = new Dimension(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+
+        backend.getDriver().manage().window().setSize(dimensions);
+
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void cleanUp(Method method, ITestResult result) {
+        var backend = threadBackend.get();
+
+        if (backend == null) {
+            return;
+        }
+
+        var className = method.getDeclaringClass().getSimpleName();
+        var methodName = method.getName();
+
+        try {
+            var driver = backend.getDriver();
+            var sessionId = driver.getSessionId();
+            var threadId = Thread.currentThread().getId();
+
+            log.info("[Thread {}][SessionId '{}']. Start cleanup for test {}.{}", threadId, sessionId, className, methodName);
+            backend.quit();
+            log.info("[Thread {}][SessionId '{}']. Finished cleanup for test {}.{}", threadId, sessionId, className, methodName);
+        } finally {
+            threadBackend.set(null);
+        }
+
+    }
+
+
+}

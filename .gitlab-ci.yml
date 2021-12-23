@@ -1,0 +1,20 @@
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode --errors --show-version -U"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.showDateTime=true"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .m2/repository
+
+stages:
+  - package
+  - release
+
+build-test-package:
+  stage: package
+  except:
+    - tags
+    - master
+  script:
+    - mvn $MAVEN_CLI_OPTS $MAVEN_OPTS deploy

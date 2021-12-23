@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<!--suppress CssUnusedSymbol -->
+<html xmlns:15px xmlns:15px>
+<head>
+    <meta charset="UTF-8">
+    <meta name="component" content="{{ component }}" />
+    <title>{{ testClass }}.{{ testMethod }}</title>
+
+    <style>
+        html {
+            font-family: 'Helvetica Neue', serif;
+            background: #F9F9F9;
+        }
+
+        body {
+            margin: 1em;
+        }
+
+        h1 {
+            font-size: 1.2em;
+            border-bottom: 1px solid lightgrey;
+            padding: 0.5em 0;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin: 0 0 0.5em;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        section {
+            border: 1px solid lightgrey;
+            background: white;
+            margin: 1em 0;
+            padding: 1em;
+            overflow: auto;
+        }
+
+        #links {
+
+            padding: 0;
+            margin: 1em 0;
+            list-style: none;
+            display: block;
+        }
+
+        #links li {
+            display: inline-block;
+        }
+
+        .test-class {
+            font-weight: normal;
+        }
+
+        .stacktrace-message {
+
+            margin: 1em 0;
+        }
+
+        .stacktrace {
+            font-size: 0.75em;
+        }
+
+        pre {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .request,
+        .log {
+            font-size: 0.75em;
+            padding: 0.25em 0;
+        }
+
+        .request:nth-child(2n),
+        .log:nth-child(2n) {
+            color: #555555;
+        }
+
+        .request:hover,
+        .log:hover {
+            background: #F0F0F0;
+        }
+
+        .request.fail,
+        .log.fail {
+            color: red !important;
+        }
+
+        .log.WARNING .level {
+            color: orange;
+        }
+
+        .log.SEVERE .level {
+            color: red;
+        }
+
+        .url {
+            white-space: nowrap;
+        }
+
+
+    </style>
+</head>
+<body>
+    <h1><span class="test-class">{{ testClass }}</span>.<span class="test-method">{{ testMethod }}</span></h1>
+
+
+    <section class="meta">
+
+        {% if (testParameter) %}
+            <h2>Test parameter</h2>
+            <ul>
+                {% for parameter in testParameter %}
+                    <li>{{ parameter }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if (sessionId) %}
+            <p><b>Session</b> <span class="session-id">{{ sessionId }}</span></p>
+        {% endif %}
+
+        <ul id="links">
+            <li class="url"><a href="{{ currentUrl }}">URL</a></li>
+            <li class="source"><a href="javascript:window.open(document.URL.replace('_report','_content'))">Source</a></li>
+            <li class="proxy"><a download="download" href="javascript:window.open(document.URL.replace('_report.html','_proxy.har'))">HAR</a></li>
+        </ul>
+    </section>
+
+    <section class="screenshot">
+        <img width='300' src='data:image/png;base64, {{ screenshot }} ' onclick="this.width=this.width==300?1050:300;"/>
+    </section>
+
+    <section>
+        <h2>Stacktrace</h2>
+
+        <div class="stacktrace-message">
+            {% autoescape 'html' %}
+                {{ throwableMessage }}
+            {% endautoescape %}
+        </div>
+        <div class="stacktrace">
+            {% for stackTraceElement in stackTrace %}
+                    <p>
+                        {% autoescape 'html' %}
+                            {{ stackTraceElement }}
+                        {% endautoescape %}
+                    </p>
+            {% endfor %}
+        </div>
+    </section>
+
+    {% if (startParameter) %}
+        <section class="start-parameter">
+            <h2>Start parameter</h2>
+            <pre>{{ startParameter }}</pre>
+        </section>
+    {% endif %}
+
+    {% if (productModel) %}
+        <section class="product-model">
+            <h2>Product model</h2>
+            <pre>{{ productModel }}</pre>
+        </section>
+    {% endif %}
+
+    {% if (capabilities) %}
+        <section class="capabilities">
+            <h2>Capabilities</h2>
+            {% for cap in capabilities.capabilities %}
+                <p><b>{{ cap[0] }}</b> {{ cap[1] }}</p>
+            {% endfor %}
+
+        </section>
+    {% endif %}
+
+    {% if (logs) %}
+
+        {% for browserLog in logs %}
+            {% if (browserLog.hasEntries) %}
+                <section>
+                    <h2>{{ browserLog.type }} log</h2>
+                    <div>
+                        {% for log in browserLog.logEntries %}
+                            <div class="log {{ log.level }}">
+                                <span class="date">{{ log.date }}</span>
+                                <span class="level">{{ log.level }}</span>
+                                <span class="message">{{ log.message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+
+
+    {% endif %}
+
+    {% if (requests) %}
+        <section>
+            <h2>Requests</h2>
+            <div>
+                {% for request in requests %}
+                    <div class="request {{ (request.success) ? "success" : "fail" }}">
+                        <a href="{{ request.url }}" target="_blank" class="url">{{ request.url }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+
+</body>
+</html>
