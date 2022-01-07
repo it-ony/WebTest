@@ -1,7 +1,6 @@
 package com.onfido.qa.webdriver;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -131,10 +130,7 @@ public class Driver implements WebDriver, JavascriptExecutor {
     }
 
     public void maximize() {
-        var width = Integer.parseInt(this.executeScript("return window.screen.width").toString());
-        var height = Integer.parseInt(this.executeScript("return window.screen.height").toString());
-
-        this.manage().window().setSize(new Dimension(width, height));
+        this.manage().window().maximize();
     }
 
     public Actions actions () {
