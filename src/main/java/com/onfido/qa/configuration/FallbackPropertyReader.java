@@ -41,7 +41,7 @@ public class FallbackPropertyReader {
 
         var localProperties = this.loadPropertiesFromResource("local.properties");
 
-        var environment = System.getProperty("environment", localProperties.getProperty("region", defaultEnvironment));
+        var environment = System.getProperty("environment", localProperties.getProperty("environment", defaultEnvironment));
         var region = System.getProperty("region", localProperties.getProperty("region", defaultRegion));
 
         Stream.of("local", "ENVIRONMENT-REGION", "REGION", "ENVIRONMENT", "common").map((key) -> {
