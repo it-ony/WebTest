@@ -93,8 +93,9 @@ public abstract class WebTest {
     private DesiredCapabilities createCapabilitiesFromProperties(Properties properties) {
         var capabilities = new DesiredCapabilities();
 
-        capabilities.setBrowserName(properties.getProperty("browser", null));
+        capabilities.setBrowserName(properties.getProperty("browser"));
         capabilities.setPlatform(Platform.fromString(properties.getProperty("platform", "ANY")));
+        capabilities.setVersion(properties.getProperty("version"));
 
         setupLoggingPreferences(properties, capabilities);
 
