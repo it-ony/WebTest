@@ -24,14 +24,14 @@ public class RemoteBackend extends Backend {
 
         var hubUrl = Objects.requireNonNull(properties.getProperty("gridUrl"));
 
-        RemoteWebDriver driver;
 
-        log.info("Connected to grid: '{}' with the following capabilities {}", hubUrl, capabilities);
+        var runOnCI = Boolean.parseBoolean(System.getenv().getOrDefault("CI", "false"));
+        if (!runOnCI) {
+            log.info("Connected to grid: '{}' with the following capabilities {}", hubUrl, capabilities);
+        }
 
-        driver = Objects.requireNonNull(getRemoteWebDriver(capabilities, new URL(hubUrl)));
+        RemoteWebDriver driver = Objects.requireNonNull(getRemoteWebDriver(capabilities, new URL(hubUrl)));
         driver.setFileDetector(new LocalFileDetector());
-
-        log.warn("Created remote web driver {}", System.identityHashCode(driver));
 
         return driver;
     }
