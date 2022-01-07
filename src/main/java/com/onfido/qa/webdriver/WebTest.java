@@ -72,6 +72,9 @@ public abstract class WebTest {
             var local = Boolean.parseBoolean(properties.getProperty("local", "false"));
 
             var capabilities = createCapabilitiesFromProperties(properties);
+
+            capabilities.setCapability("name", String.format("%s::%s", method.getDeclaringClass().getSimpleName(), method.getName()));
+
             extendCapabilities(capabilities);
 
             var backend = local ? new LocalBackend(capabilities, properties) : new RemoteBackend(capabilities, properties);
