@@ -2,14 +2,13 @@ package com.onfido.qa.webdriver.listener;
 
 
 import com.onfido.qa.webdriver.Driver;
+import com.onfido.qa.webdriver.WebTest;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
-import com.onfido.qa.webdriver.WebTest;
 import org.apache.commons.io.FileUtils;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
-import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
@@ -29,7 +28,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 
-@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "unchecked"})
+@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "unchecked", "AccessOfSystemProperties", "HardcodedLineSeparator"})
 public class ScreenshotListener extends TestListenerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(ScreenshotListener.class);
@@ -98,9 +97,7 @@ public class ScreenshotListener extends TestListenerAdapter {
             model.with("sessionId", driver.getSessionId())
                  .with("currentUrl", driver.getCurrentUrl())
                  .with("screenshot", getScreenshot(driver))
-                 .with("startParameter", getStartParameter(driver))
-                 .with("logs", getLogEntries(driver))
-                 .with("productModel", getProductModel(driver));
+                 .with("logs", getLogEntries(driver));
 
         }
 
@@ -157,32 +154,6 @@ public class ScreenshotListener extends TestListenerAdapter {
                     .collect(Collectors.toList());
 
     }
-
-
-    private Object getStartParameter(RemoteWebDriver driver) {
-        return getObjectFromStage(driver, "getStartParameter()");
-
-    }
-
-    private Object getProductModel(RemoteWebDriver driver) {
-        return getObjectFromStage(driver, "getProductModel()");
-
-    }
-
-    private Object getObjectFromStage(RemoteWebDriver driver, String method) {
-        try {
-            var stage = driver.findElement(By.className("stage"));
-            if (stage == null) {
-                return null;
-            }
-
-            return driver.executeScript("return JSON.stringify(arguments[0]." + method + ", null, 2);", stage);
-        } catch (Exception ignored) {
-        }
-
-        return null;
-    }
-
 
     private StackTraceElement[] getStackTrace(ITestResult result) {
         return result.getThrowable().getStackTrace();
