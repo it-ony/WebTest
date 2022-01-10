@@ -10,6 +10,7 @@
         <selenium-support.version>4.1.1</selenium-support.version>
         <testng.version>7.4.0</testng.version>
         <slf4j.version>1.7.32</slf4j.version>
+        <retrofit.version>2.9.0</retrofit.version>
     </properties>
 
     <distributionManagement>
@@ -82,6 +83,18 @@
             <groupId>com.browserstack</groupId>
             <artifactId>browserstack-local-java</artifactId>
             <version>1.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>${retrofit.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-jackson</artifactId>
+            <version>${retrofit.version}</version>
         </dependency>
 
     </dependencies>
