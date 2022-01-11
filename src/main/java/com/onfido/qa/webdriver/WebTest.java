@@ -86,8 +86,14 @@ public abstract class WebTest {
             annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
             annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
 
-            config.withFakeDeviceForMediaStream(annotations.stream().anyMatch(Browser::fakeDeviceForMediaStream));
-            config.withFakeUiForMediaStream(annotations.stream().anyMatch(Browser::fakeUiForMediaStream));
+            config.withEnableMicrophoneCameraAccess(annotations.stream().anyMatch(Browser::enableMicrophoneCameraAccess));
+            config.withFileForFakeAudioCapture(annotations.stream().map(Browser::fileForFakeAudioCapture)
+                                                          .filter(cs -> !StringUtils.isEmpty(cs))
+                                                          .findFirst().orElse(null));
+
+            config.withFileForFakeVideoCapture(annotations.stream().map(Browser::fileForFakeVideoCapture)
+                                                          .filter(cs -> !StringUtils.isEmpty(cs))
+                                                          .findFirst().orElse(null));
 
             var capabilities = createCapabilitiesFromProperties(properties);
 

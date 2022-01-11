@@ -5,8 +5,10 @@ import com.onfido.qa.annotation.Mobile;
 public class Config {
 
     boolean requiresMobileDevice;
-    boolean fakeDeviceForMediaStream;
-    boolean fakeUiForMediaStream;
+    boolean enableMicrophoneCameraAccess;
+
+    String fileForFakeAudioCapture;
+    String fileForFakeVideoCapture;
 
     Mobile mobileDevice;
 
@@ -18,13 +20,18 @@ public class Config {
         return this;
     }
 
-    public Config withFakeDeviceForMediaStream(boolean fakeDeviceForMediaStream) {
-        this.fakeDeviceForMediaStream = fakeDeviceForMediaStream;
+    public Config withEnableMicrophoneCameraAccess(boolean enableMicrophoneCameraAccess) {
+        this.enableMicrophoneCameraAccess = enableMicrophoneCameraAccess;
         return this;
     }
 
-    public Config withFakeUiForMediaStream(boolean fakeUiForMediaStream) {
-        this.fakeUiForMediaStream = fakeUiForMediaStream;
+    public Config withFileForFakeAudioCapture(String fileForFakeAudioCapture) {
+        this.fileForFakeAudioCapture = fileForFakeAudioCapture;
+        return this;
+    }
+
+    public Config withFileForFakeVideoCapture(String fileForFakeVideoCapture) {
+        this.fileForFakeVideoCapture = fileForFakeVideoCapture;
         return this;
     }
 }

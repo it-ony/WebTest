@@ -1,7 +1,7 @@
 package com.onfido.qa.webdriver.backend;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverLogLevel;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class LocalBackend extends Backend {
 
@@ -50,7 +52,7 @@ public class LocalBackend extends Backend {
     private String getBrowser(DesiredCapabilities capabilities) {
         var browserName = capabilities.getBrowserName();
 
-        if (StringUtils.isEmpty(browserName)) {
+        if (isEmpty(browserName)) {
             return "chrome";
         }
 
@@ -90,9 +92,12 @@ public class LocalBackend extends Backend {
 
             var builder = new ChromeDriverService
                     .Builder()
+                    .withLogLevel(ChromeDriverLogLevel.DEBUG)
+                    .withVerbose(true)
+                    .withLogFile(new File("/tmp/ChromeDriverLog.txt"))
                     .usingAnyFreePort();
 
-            if (!StringUtils.isEmpty(browserPath)) {
+            if (!isEmpty(browserPath)) {
                 builder.usingDriverExecutable(new File(browserPath));
             }
 
@@ -108,12 +113,17 @@ public class LocalBackend extends Backend {
 
             var chromeOptions = new ChromeOptions();
 
-            if (config.fakeDeviceForMediaStream) {
-                chromeOptions.addArguments("use-fake-device-for-media-stream");
-            }
+            if (config.enableMicrophoneCameraAccess) {
+                chromeOptions.addArguments("--use-fake-device-for-media-stream");
+                chromeOptions.addArguments("--use-fake-ui-for-media-stream");
 
-            if (config.fakeUiForMediaStream) {
-                chromeOptions.addArguments("use-fake-ui-for-media-stream");
+                if (!isEmpty(config.fileForFakeAudioCapture)) {
+                    chromeOptions.addArguments("--use-file-for-fake-audio-capture=" + getCanonicalPath(config.fileForFakeAudioCapture));
+                }
+
+                if (!isEmpty(config.fileForFakeVideoCapture)) {
+                    chromeOptions.addArguments("--use-file-for-fake-video-capture=" + getCanonicalPath(config.fileForFakeVideoCapture));
+                }
             }
 
             if (config.requiresMobileDevice) {
@@ -121,6 +131,14 @@ public class LocalBackend extends Backend {
             }
 
             return new ChromeDriver((ChromeDriverService) service, chromeOptions.merge(capabilities));
+        }
+
+        private String getCanonicalPath(String config)  {
+            try {
+                return new File(config).getCanonicalPath();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         protected void setupMobileDevice(ChromeOptions chromeOptions, Config config) {
