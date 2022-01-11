@@ -1,7 +1,10 @@
 package com.onfido.qa.webdriver;
 
 
+import com.onfido.qa.annotation.Browser;
+import com.onfido.qa.annotation.Mobile;
 import com.onfido.qa.webdriver.backend.Backend;
+import com.onfido.qa.webdriver.backend.Config;
 import com.onfido.qa.webdriver.backend.LocalBackend;
 import com.onfido.qa.webdriver.backend.RemoteBackend;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -18,8 +21,11 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -70,6 +76,18 @@ public abstract class WebTest {
         try {
             var properties = this.properties();
             var local = Boolean.parseBoolean(properties.getProperty("local", "false"));
+            var config = new Config();
+
+            if (method.isAnnotationPresent(Mobile.class)) {
+                config.mobile(method.getAnnotation(Mobile.class));
+            }
+
+            List<Browser> annotations = new ArrayList<>();
+            annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
+            annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
+
+            config.withFakeDeviceForMediaStream(annotations.stream().anyMatch(Browser::fakeDeviceForMediaStream));
+            config.withFakeUiForMediaStream(annotations.stream().anyMatch(Browser::fakeUiForMediaStream));
 
             var capabilities = createCapabilitiesFromProperties(properties);
 
@@ -77,7 +95,7 @@ public abstract class WebTest {
 
             extendCapabilities(capabilities);
 
-            var backend = local ? new LocalBackend(capabilities, properties) : new RemoteBackend(capabilities, properties);
+            var backend = local ? new LocalBackend(capabilities, properties, config) : new RemoteBackend(capabilities, properties, config);
 
             threadBackend.set(backend);
 
@@ -89,6 +107,20 @@ public abstract class WebTest {
             throw t;
         }
     }
+
+    private <T extends Annotation> List<T> getAnnotations(Class<?> type, Class<T> annotationClass) {
+
+        var annotations = new ArrayList<Annotation>();
+
+        while (type != null) {
+            annotations.addAll(Arrays.asList(type.getAnnotationsByType(annotationClass)));
+            type = type.getSuperclass();
+        }
+
+        //noinspection unchecked
+        return (List<T>) annotations;
+    }
+
 
     private DesiredCapabilities createCapabilitiesFromProperties(Properties properties) {
         var capabilities = new DesiredCapabilities();

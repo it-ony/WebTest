@@ -24,18 +24,27 @@ public class RemoteBackend extends Backend {
     private static final Logger log = LoggerFactory.getLogger(RemoteBackend.class);
     private Local local;
 
-    public RemoteBackend(DesiredCapabilities capabilities, Properties properties) throws Exception {
-        super(capabilities, properties);
+    public RemoteBackend(DesiredCapabilities capabilities, Properties properties, Config config) throws Exception {
+        super(capabilities, properties, config);
     }
 
     @Override
-    protected RemoteWebDriver createDriver(DesiredCapabilities capabilities, Properties properties) throws Exception {
+    protected RemoteWebDriver createDriver(DesiredCapabilities capabilities, Properties properties, Config config) throws Exception {
 
         var browserStackHub = setupBrowserStack(properties, capabilities);
         var gridUrl = properties.getProperty("gridUrl");
 
         if (!StringUtils.isEmpty(browserStackHub) && !StringUtils.isEmpty(gridUrl)) {
             throw new InvalidArgumentException("both, browserstack and grid urls are defined");
+        }
+
+        if (config.requiresMobileDevice) {
+            if (browserStackHub != null) {
+                // running against browser stack
+                capabilities.setCapability("device", Optional.ofNullable(config.mobileDevice.device()).orElse(properties.getProperty("device", "Pixel 3a")));
+            } else {
+                throw new RuntimeException("I don't know how to bootstrap the mobile device");
+            }
         }
 
         var hubUrl = Objects.requireNonNull(Optional.ofNullable(browserStackHub).orElse(gridUrl));

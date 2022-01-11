@@ -24,22 +24,20 @@ import static net.lightbody.bmp.proxy.CaptureType.RESPONSE_HEADERS;
 public abstract class Backend implements Closeable {
 
     private static final Logger log = LoggerFactory.getLogger(Backend.class);
-    private final Properties properties;
 
     protected Driver driver;
     protected BrowserMobProxyServer proxyServer;
 
     // TODO: add proxy support
 
-    protected Backend(DesiredCapabilities capabilities, Properties properties) throws Exception {
-        this.properties = properties;
+    protected Backend(DesiredCapabilities capabilities, Properties properties, Config config) throws Exception {
 
         if (Boolean.parseBoolean(properties.getProperty("useBrowserMobProxy"))) {
             addBrowserMobProxy(capabilities);
         }
 
         //noinspection AbstractMethodCallInConstructor, OverridableMethodCallDuringObjectConstruction, OverriddenMethodCallDuringObjectConstruction
-        driver = new Driver(createDriver(capabilities, properties));
+        driver = new Driver(createDriver(capabilities, properties, config));
     }
 
     public Driver getDriver() {
@@ -50,8 +48,10 @@ public abstract class Backend implements Closeable {
         return proxyServer;
     }
 
-    protected abstract RemoteWebDriver createDriver(DesiredCapabilities capabilities, Properties properties) throws Exception;
-    
+    protected abstract RemoteWebDriver createDriver(DesiredCapabilities capabilities,
+                                                    Properties properties,
+                                                    Config config) throws Exception;
+
     public void quit() {
         if (driver != null) {
             log.info("Quitting driver {}", System.identityHashCode(driver));
