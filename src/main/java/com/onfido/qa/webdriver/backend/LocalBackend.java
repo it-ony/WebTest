@@ -1,7 +1,6 @@
 package com.onfido.qa.webdriver.backend;
 
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverLogLevel;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -92,9 +91,6 @@ public class LocalBackend extends Backend {
 
             var builder = new ChromeDriverService
                     .Builder()
-                    .withLogLevel(ChromeDriverLogLevel.DEBUG)
-                    .withVerbose(true)
-                    .withLogFile(new File("/tmp/ChromeDriverLog.txt"))
                     .usingAnyFreePort();
 
             if (!isEmpty(browserPath)) {
