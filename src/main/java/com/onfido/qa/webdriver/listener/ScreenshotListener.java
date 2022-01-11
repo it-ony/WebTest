@@ -37,7 +37,7 @@ public class ScreenshotListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult result) {
         super.onTestFailure(result);
 
-        if (Boolean.parseBoolean(System.getProperty("screenshotListener.skip", "false"))) {
+        if (!isEnabled()) {
             return;
         }
 
@@ -58,11 +58,15 @@ public class ScreenshotListener extends TestListenerAdapter {
 
     }
 
+    private boolean isEnabled() {
+        return Boolean.parseBoolean(System.getProperty("screenshotListener.enabled", "true"));
+    }
+
     @Override
     public void onFinish(ITestContext testContext) {
         super.onFinish(testContext);
 
-        if (testContext.getFailedTests().size() > 0) {
+        if (isEnabled() && testContext.getFailedTests().size() > 0) {
             log.error("\n\nFind your webdriver reports under {}\n\n", new File(PATHNAME).getAbsoluteFile());
 
         }
