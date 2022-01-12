@@ -5,8 +5,6 @@ import com.onfido.qa.annotation.Browser;
 import com.onfido.qa.annotation.Mobile;
 import com.onfido.qa.webdriver.backend.Backend;
 import com.onfido.qa.webdriver.backend.Config;
-import com.onfido.qa.webdriver.backend.LocalBackend;
-import com.onfido.qa.webdriver.backend.RemoteBackend;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Dimension;
@@ -75,25 +73,8 @@ public abstract class WebTest {
 
         try {
             var properties = this.properties();
-            var local = Boolean.parseBoolean(properties.getProperty("local", "false"));
-            var config = new Config();
 
-            if (method.isAnnotationPresent(Mobile.class)) {
-                config.mobile(method.getAnnotation(Mobile.class));
-            }
-
-            List<Browser> annotations = new ArrayList<>();
-            annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
-            annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
-
-            config.withEnableMicrophoneCameraAccess(annotations.stream().anyMatch(Browser::enableMicrophoneCameraAccess));
-            config.withFileForFakeAudioCapture(annotations.stream().map(Browser::fileForFakeAudioCapture)
-                                                          .filter(cs -> !StringUtils.isEmpty(cs))
-                                                          .findFirst().orElse(null));
-
-            config.withFileForFakeVideoCapture(annotations.stream().map(Browser::fileForFakeVideoCapture)
-                                                          .filter(cs -> !StringUtils.isEmpty(cs))
-                                                          .findFirst().orElse(null));
+            var config = createConfiguration(method);
 
             var capabilities = createCapabilitiesFromProperties(properties);
 
@@ -101,7 +82,7 @@ public abstract class WebTest {
 
             extendCapabilities(capabilities);
 
-            var backend = local ? new LocalBackend(capabilities, properties, config) : new RemoteBackend(capabilities, properties, config);
+            var backend = new Backend(capabilities, properties, config);
 
             threadBackend.set(backend);
 
@@ -112,6 +93,30 @@ public abstract class WebTest {
                                                                                                                    .getSimpleName(), method.getName());
             throw t;
         }
+    }
+
+    private Config createConfiguration(Method method) {
+
+        var config = new Config();
+
+        if (method.isAnnotationPresent(Mobile.class)) {
+            config.mobile(method.getAnnotation(Mobile.class));
+        }
+
+        List<Browser> annotations = new ArrayList<>();
+        annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
+        annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
+
+        config.withEnableMicrophoneCameraAccess(annotations.stream().anyMatch(Browser::enableMicrophoneCameraAccess));
+        config.withFileForFakeAudioCapture(annotations.stream().map(Browser::fileForFakeAudioCapture)
+                                                      .filter(cs -> !StringUtils.isEmpty(cs))
+                                                      .findFirst().orElse(null));
+
+        config.withFileForFakeVideoCapture(annotations.stream().map(Browser::fileForFakeVideoCapture)
+                                                      .filter(cs -> !StringUtils.isEmpty(cs))
+                                                      .findFirst().orElse(null));
+
+        return config;
     }
 
     private <T extends Annotation> List<T> getAnnotations(Class<?> type, Class<T> annotationClass) {

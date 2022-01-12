@@ -20,6 +20,10 @@ public class Config {
         return this;
     }
 
+    public boolean allowMobileEmulation() {
+        return this.mobileDevice != null && this.mobileDevice.allowEmulation();
+    }
+
     public Config withEnableMicrophoneCameraAccess(boolean enableMicrophoneCameraAccess) {
         this.enableMicrophoneCameraAccess = enableMicrophoneCameraAccess;
         return this;

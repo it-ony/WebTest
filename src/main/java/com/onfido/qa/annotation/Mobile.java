@@ -9,9 +9,12 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mobile {
 
+    boolean allowEmulation() default true;
+
     int width() default 0;
     int height() default  0;
     int pixelRation() default 0;
-    String device () default "";
 
+    String device () default "";
+    String osVersion() default "";
 }
