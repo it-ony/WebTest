@@ -53,8 +53,10 @@ public class Backend implements Closeable {
 
     static {
         BROWSER_FACTORIES.put("chrome", new Chrome());
+        BROWSER_FACTORIES.put("firefox", new Firefox());
 
         DRIVER_SERVICE_FACTORY.put("chrome", new ChromeDriver());
+        DRIVER_SERVICE_FACTORY.put("firefox", new FirefoxDriver());
     }
 
     public Backend(DesiredCapabilities capabilities, Properties properties, Config config) throws Exception {
