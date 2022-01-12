@@ -30,6 +30,8 @@ class Chrome implements BrowserFactory {
     public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config) {
         var chromeOptions = new ChromeOptions();
 
+        chromeOptions.setAcceptInsecureCerts(config.acceptInsecureCertificates);
+
         if (config.enableMicrophoneCameraAccess) {
             chromeOptions.addArguments("--use-fake-device-for-media-stream");
             chromeOptions.addArguments("--use-fake-ui-for-media-stream");
