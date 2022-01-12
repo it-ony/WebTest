@@ -6,10 +6,11 @@ public class Config {
 
     boolean requiresMobileDevice;
     boolean enableMicrophoneCameraAccess;
+    boolean acceptInsecureCertificates;
 
     String fileForFakeAudioCapture;
-    String fileForFakeVideoCapture;
 
+    String fileForFakeVideoCapture;
     Mobile mobileDevice;
 
     public Config mobile(Mobile mobile) {
@@ -36,6 +37,11 @@ public class Config {
 
     public Config withFileForFakeVideoCapture(String fileForFakeVideoCapture) {
         this.fileForFakeVideoCapture = fileForFakeVideoCapture;
+        return this;
+    }
+
+    public Config withAcceptInsecureCertificates(boolean acceptInsecureCertificates) {
+        this.acceptInsecureCertificates = acceptInsecureCertificates;
         return this;
     }
 }

@@ -11,4 +11,5 @@ public @interface Browser {
     String fileForFakeAudioCapture() default "";
     String fileForFakeVideoCapture() default "";
 
+    boolean acceptInsureCertificates() default false;
 }

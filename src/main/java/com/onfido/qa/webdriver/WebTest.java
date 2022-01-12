@@ -116,6 +116,8 @@ public abstract class WebTest {
                                                       .filter(cs -> !StringUtils.isEmpty(cs))
                                                       .findFirst().orElse(null));
 
+        config.withAcceptInsecureCertificates(annotations.stream().anyMatch(Browser::acceptInsureCertificates));
+
         return config;
     }
 
