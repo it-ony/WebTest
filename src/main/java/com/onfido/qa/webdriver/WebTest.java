@@ -187,9 +187,9 @@ public abstract class WebTest {
             var sessionId = driver.getSessionId();
             var threadId = Thread.currentThread().getId();
 
-            log.info("[Thread {}][SessionId '{}']. Start cleanup for test {}.{}", threadId, sessionId, className, methodName);
+            log.debug("[Thread {}][SessionId '{}']. Start cleanup for test {}.{}", threadId, sessionId, className, methodName);
             backend.quit();
-            log.info("[Thread {}][SessionId '{}']. Finished cleanup for test {}.{}", threadId, sessionId, className, methodName);
+            log.debug("[Thread {}][SessionId '{}']. Finished cleanup for test {}.{}", threadId, sessionId, className, methodName);
         } finally {
             threadBackend.set(null);
         }
