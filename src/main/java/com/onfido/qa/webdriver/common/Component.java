@@ -108,7 +108,7 @@ public abstract class Component {
         void run() throws Exception;
     }
 
-    protected <T> T createComponent(Class<T> tClass) {
+    protected <T extends Component> T createComponent(Class<T> tClass) {
         return createComponent(driver, tClass);
     }
 
