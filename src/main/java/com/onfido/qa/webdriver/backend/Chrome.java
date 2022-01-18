@@ -12,6 +12,7 @@ import org.openqa.selenium.remote.service.DriverService;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Properties;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -27,11 +28,13 @@ class Chrome implements BrowserFactory {
     }
 
     @Override
-    public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config) {
+    public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config, Properties properties) {
         var chromeOptions = new ChromeOptions();
 
         chromeOptions.setAcceptInsecureCerts(config.acceptInsecureCertificates);
 
+        chromeOptions.setHeadless(Boolean.parseBoolean(properties.getProperty("headless", "false")));
+        
         if (config.enableMicrophoneCameraAccess) {
             chromeOptions.addArguments("--use-fake-device-for-media-stream");
             chromeOptions.addArguments("--use-fake-ui-for-media-stream");

@@ -7,6 +7,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 
+import java.util.Properties;
+
 public class Firefox implements BrowserFactory {
     @Override
     public RemoteWebDriver createDriver(DriverService service, Capabilities capabilities) {
@@ -14,7 +16,7 @@ public class Firefox implements BrowserFactory {
     }
 
     @Override
-    public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config) {
+    public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config, Properties properties) {
 
         var options = new FirefoxOptions(capabilities);
         options.setAcceptInsecureCerts(config.acceptInsecureCertificates);

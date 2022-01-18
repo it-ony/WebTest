@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.util.Objects.requireNonNull;
 import static net.lightbody.bmp.proxy.CaptureType.REQUEST_CONTENT;
 import static net.lightbody.bmp.proxy.CaptureType.REQUEST_COOKIES;
 import static net.lightbody.bmp.proxy.CaptureType.REQUEST_HEADERS;
@@ -68,7 +68,7 @@ public class Backend implements Closeable {
         if (runLocal) {
             var message = String.format("Cannot create browser '%s' for local testing. Implementation missing.", browser);
 
-            service = Objects.requireNonNull(DRIVER_SERVICE_FACTORY.get(browser), message).createDriverService(properties);
+            service = requireNonNull(DRIVER_SERVICE_FACTORY.get(browser), message).createDriverService(properties);
             service.start();
         }
 
@@ -76,11 +76,11 @@ public class Backend implements Closeable {
 
         MutableCapabilities realCapabilities = capabilities;
         if (factory != null) {
-            realCapabilities = factory.getOptions(capabilities, config);
+            realCapabilities = factory.getOptions(capabilities, config, properties);
         }
 
         if (runLocal) {
-            driver = new Driver(factory.createDriver(service, realCapabilities));
+            driver = new Driver(requireNonNull(factory).createDriver(service, realCapabilities));
         } else {
             driver = new Driver(createRemoteDriver(realCapabilities, properties, config));
         }
@@ -115,7 +115,7 @@ public class Backend implements Closeable {
 
         }
 
-        var hubUrl = Objects.requireNonNull(Optional.ofNullable(browserStackHub).orElse(gridUrl));
+        var hubUrl = requireNonNull(Optional.ofNullable(browserStackHub).orElse(gridUrl));
 
         logGrid(capabilities, hubUrl);
 
