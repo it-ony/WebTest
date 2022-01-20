@@ -1,7 +1,7 @@
 package com.onfido.qa.webdriver.listener;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.onfido.qa.webdriver.WebTest;
+import com.onfido.qa.webdriver.WebTestBase;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -130,7 +130,7 @@ public class BrowserStackListener extends TestListenerAdapter {
             return;
         }
 
-        var sessionId = Objects.requireNonNull(WebTest.d()).getSessionId();
+        var sessionId = Objects.requireNonNull(WebTestBase.d()).getSessionId();
         if (sessionId == null) {
             return;
         }

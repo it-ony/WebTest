@@ -2,7 +2,7 @@ package com.onfido.qa.webdriver.listener;
 
 
 import com.onfido.qa.webdriver.Driver;
-import com.onfido.qa.webdriver.WebTest;
+import com.onfido.qa.webdriver.WebTestBase;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
@@ -75,7 +75,7 @@ public class ScreenshotListener extends TestListenerAdapter {
 
     private Driver getRemoteWebDriver() {
         try {
-            return WebTest.d();
+            return WebTestBase.d();
         } catch (Exception e) {
             log.error("Error getting the driver", e);
             throw e;
@@ -144,7 +144,7 @@ public class ScreenshotListener extends TestListenerAdapter {
     }
 
     private Object getRequests() {
-        var proxy = WebTest.proxy();
+        var proxy = WebTestBase.proxy();
 
         if (proxy == null) {
             return null;
@@ -186,7 +186,7 @@ public class ScreenshotListener extends TestListenerAdapter {
     }
 
     private void createProxyReport(String testResultPath) {
-        var proxy = WebTest.proxy();
+        var proxy = WebTestBase.proxy();
 
         var filterHar = Boolean.parseBoolean(System.getProperty("screenshotListener.filterHar", "true"));
 
