@@ -244,7 +244,7 @@ You can set properties with the `-D` option. Those are taken with priority to th
 ## running from your IDE
 
 To ease debugging and running tests most IDEs can execute test methods directly from the IDE. 
-Give [Intellij Idea](https://www.jetbrains.com/idea/) if you like.
+Give [Intellij Idea](https://www.jetbrains.com/idea/) a try if you like.
 
 # ScreenshotListener
 
@@ -261,14 +261,14 @@ public class MyTestIT extends WebTest {
 
 # Emulating mobile devices
 
-To emulate a mobile device use the `@Browser` annotation. You can define the `width` and `height` of the screen as well as the 
+To emulate a mobile device use the `@Mobile` annotation. You can define the `width` and `height` of the screen as well as the 
 `pixelRatio`. You can disallow emulation by setting `allowEmulation=false` and define the `device` and the `osVersion. 
 
 Mobile emulation is only available on chrome (and most likely on edge).
 
 # Switch easily between environments
 
-A best pratice is to run your tests against local and testing them before the commit against a remote grid that your CI system 
+A best practice is to run your tests against local and testing them before the commit against a remote grid that your CI system 
 is testing against. You can do this easily by having different property files for the environments.
 
 In your `local.properties` file only put
