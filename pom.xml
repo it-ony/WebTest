@@ -4,7 +4,7 @@
 
     <groupId>com.onfido.qa.webdriver</groupId>
     <artifactId>webtest</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
 
     <properties>
         <selenium-support.version>4.1.1</selenium-support.version>
