@@ -149,7 +149,7 @@ public abstract class WebTest {
 
         capabilities.setBrowserName(properties.getProperty("browser"));
         capabilities.setPlatform(Platform.fromString(properties.getProperty("platform", "ANY")));
-        capabilities.setVersion(properties.getProperty("version"));
+        capabilities.setCapability(CapabilityType.BROWSER_VERSION, properties.getProperty("browserVersion"));
 
         setupLoggingPreferences(properties, capabilities);
 
