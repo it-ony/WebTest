@@ -74,9 +74,15 @@ public abstract class WebTest {
         try {
             var properties = this.properties();
 
-            var config = createConfiguration(method);
-
             var capabilities = createCapabilitiesFromProperties(properties);
+            var browserAnnotations = getBrowserAnnotations(method);
+
+            var config = createConfiguration(method, browserAnnotations);
+            var optionalBrowser = browserAnnotations.stream().filter(x -> x.platform() != Platform.ANY).findFirst();
+
+            if (optionalBrowser.isPresent()) {
+                capabilities.setPlatform(optionalBrowser.get().platform());
+            }
 
             capabilities.setCapability("name", String.format("%s::%s", method.getDeclaringClass().getSimpleName(), method.getName()));
 
@@ -95,17 +101,13 @@ public abstract class WebTest {
         }
     }
 
-    private Config createConfiguration(Method method) {
+    private Config createConfiguration(Method method, List<Browser> annotations) {
 
         var config = new Config();
 
         if (method.isAnnotationPresent(Mobile.class)) {
             config.mobile(method.getAnnotation(Mobile.class));
         }
-
-        List<Browser> annotations = new ArrayList<>();
-        annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
-        annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
 
         config.withEnableMicrophoneCameraAccess(annotations.stream().anyMatch(Browser::enableMicrophoneCameraAccess));
         config.withFileForFakeAudioCapture(annotations.stream().map(Browser::fileForFakeAudioCapture)
@@ -119,6 +121,13 @@ public abstract class WebTest {
         config.withAcceptInsecureCertificates(annotations.stream().anyMatch(Browser::acceptInsureCertificates));
 
         return config;
+    }
+
+    private List<Browser> getBrowserAnnotations(Method method) {
+        List<Browser> annotations = new ArrayList<>();
+        annotations.addAll(Arrays.asList(method.getAnnotationsByType(Browser.class)));
+        annotations.addAll(getAnnotations(method.getDeclaringClass(), Browser.class));
+        return annotations;
     }
 
     private <T extends Annotation> List<T> getAnnotations(Class<?> type, Class<T> annotationClass) {
