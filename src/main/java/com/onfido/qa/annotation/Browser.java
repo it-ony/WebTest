@@ -9,6 +9,8 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Browser {
 
     Platform platform() default Platform.ANY;
+    String browser() default "";
+    String browserVersion() default "";
 
     boolean enableMicrophoneCameraAccess() default false;
 
