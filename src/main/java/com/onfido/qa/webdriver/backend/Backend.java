@@ -6,6 +6,7 @@ import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
@@ -16,12 +17,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
@@ -119,10 +122,29 @@ public class Backend implements Closeable {
 
         logGrid(capabilities, hubUrl);
 
-        var driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
+        var maxRetries = Integer.parseInt(properties.getProperty("grid.maxRetries", "1"));
+
+        RemoteWebDriver driver = getRemoteWebDriver(capabilities, hubUrl, maxRetries);
         driver.setFileDetector(new LocalFileDetector());
 
         return driver;
+    }
+
+    private RemoteWebDriver getRemoteWebDriver(MutableCapabilities capabilities, String hubUrl, int maxRetries) throws MalformedURLException {
+
+        SessionNotCreatedException exception = null;
+
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                return new RemoteWebDriver(new URL(hubUrl), capabilities);
+            } catch (SessionNotCreatedException e) {
+                log.warn("Exception while connecting to grid", e);
+                exception = e;
+            }
+        }
+
+        throw Objects.requireNonNull(exception);
+
     }
 
     private void logGrid(MutableCapabilities capabilities, String hubUrl) {

@@ -214,7 +214,7 @@ public abstract class WebTestBase {
     }
 
     protected Driver driver() {
-        return WebTestBase.d();
+        return d();
     }
 
     protected abstract Properties properties();
