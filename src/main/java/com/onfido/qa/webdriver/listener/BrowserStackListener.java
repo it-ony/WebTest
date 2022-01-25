@@ -1,7 +1,6 @@
 package com.onfido.qa.webdriver.listener;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.onfido.qa.webdriver.Driver;
 import com.onfido.qa.webdriver.WebTestBase;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -21,7 +20,6 @@ import retrofit2.http.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Objects;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -110,7 +108,7 @@ public class BrowserStackListener extends TestListenerAdapter {
     public void onTestSkipped(ITestResult tr) {
         super.onTestSkipped(tr);
 
-        report(Status.FAILED, "SKIPPED");
+        report(Status.PASSED, "SKIPPED");
     }
 
     private void report(Status status) {
