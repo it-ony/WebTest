@@ -6,6 +6,6 @@ import java.util.Properties;
 
 public interface DriverServiceFactory {
 
-    abstract DriverService createDriverService(Properties properties);
+    DriverService createDriverService(Properties properties);
 
 }

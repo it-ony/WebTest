@@ -7,6 +7,7 @@ import net.lightbody.bmp.client.ClientUtil;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,8 +73,8 @@ public class Backend implements Closeable {
         if (runLocal) {
             var message = String.format("Cannot create browser '%s' for local testing. Implementation missing.", browser);
 
-            service = requireNonNull(DRIVER_SERVICE_FACTORY.get(browser), message).createDriverService(properties);
-            service.start();
+            var driverServiceFactory = requireNonNull(DRIVER_SERVICE_FACTORY.get(browser), message);
+            service = startDriverService(properties, driverServiceFactory);
         }
 
         BrowserFactory factory = BROWSER_FACTORIES.get(browser);
@@ -87,6 +89,28 @@ public class Backend implements Closeable {
         } else {
             driver = new Driver(createRemoteDriver(realCapabilities, properties, config));
         }
+
+    }
+
+    private DriverService startDriverService(Properties properties, DriverServiceFactory driverServiceFactory) throws IOException {
+
+        WebDriverException exception = null;
+        var maxRetries = Integer.parseInt(properties.getProperty("driver.maxRetries", "2"));
+
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                var service = driverServiceFactory.createDriverService(properties);
+                service.start();
+
+                return service;
+            } catch (SessionNotCreatedException e) {
+                log.warn("Exception while connecting to grid", e);
+                exception = e;
+            }
+        }
+
+        throw Objects.requireNonNull(exception);
+
 
     }
 
