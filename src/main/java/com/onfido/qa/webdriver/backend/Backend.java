@@ -54,7 +54,7 @@ public class Backend implements Closeable {
 
     private static final Map<String, BrowserFactory> BROWSER_FACTORIES = new HashMap<>();
     private static final Map<String, DriverServiceFactory> DRIVER_SERVICE_FACTORY = new HashMap<>();
-
+    public static final BrowserFactoryBase BROWSER_FACTORY_BASE = new BrowserFactoryBase();
 
     static {
         BROWSER_FACTORIES.put("chrome", new Chrome());
@@ -77,12 +77,9 @@ public class Backend implements Closeable {
             service = startDriverService(properties, driverServiceFactory);
         }
 
-        BrowserFactory factory = BROWSER_FACTORIES.get(browser);
+        BrowserFactory factory = BROWSER_FACTORIES.getOrDefault(browser, BROWSER_FACTORY_BASE);
 
-        MutableCapabilities realCapabilities = capabilities;
-        if (factory != null) {
-            realCapabilities = factory.getOptions(capabilities, config, properties);
-        }
+        var realCapabilities = factory.getOptions(capabilities, config, properties);
 
         if (runLocal) {
             driver = new Driver(requireNonNull(factory).createDriver(service, realCapabilities));
@@ -99,7 +96,7 @@ public class Backend implements Closeable {
 
         for (int i = 0; i < maxRetries; i++) {
             try {
-                var service = driverServiceFactory.createDriverService(properties);
+                var service = driverServiceFactory.createDriverService(properties, i >= 1);
                 service.start();
 
                 return service;
