@@ -6,6 +6,6 @@ import java.util.Properties;
 
 public interface DriverServiceFactory {
 
-    DriverService createDriverService(Properties properties);
+    DriverService createDriverService(Properties properties, boolean forceLog);
 
 }

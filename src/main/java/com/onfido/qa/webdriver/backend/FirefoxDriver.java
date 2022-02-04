@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class FirefoxDriver implements DriverServiceFactory {
     @Override
-    public DriverService createDriverService(Properties properties) {
+    public DriverService createDriverService(Properties properties, boolean forceLog) {
 
         return new GeckoDriverService.Builder()
                 .usingAnyFreePort()
