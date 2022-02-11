@@ -27,6 +27,8 @@ public class Firefox implements BrowserFactory {
             options.addPreference("permissions.default.camera", 1);
         }
 
+        options.setHeadless(Boolean.parseBoolean(properties.getProperty("headless", "false")));
+
         return options;
 
     }
