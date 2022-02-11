@@ -3,6 +3,7 @@ package com.onfido.qa.webdriver.backend;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
@@ -18,7 +19,8 @@ public class Firefox implements BrowserFactory {
     @Override
     public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config, Properties properties) {
 
-        var options = new FirefoxOptions(capabilities);
+        var options = new FirefoxOptions();
+        
         options.setAcceptInsecureCerts(config.acceptInsecureCertificates);
 
         if (config.enableMicrophoneCameraAccess) {
@@ -27,9 +29,19 @@ public class Firefox implements BrowserFactory {
             options.addPreference("permissions.default.camera", 1);
         }
 
-        options.setHeadless(Boolean.parseBoolean(properties.getProperty("headless", "false")));
+        var headless = Boolean.parseBoolean(properties.getProperty("headless", "false"));
+        options.setHeadless(headless);
 
+        // do not copy logging preferences, if running in headless mode: https://github.com/SeleniumHQ/selenium/issues/10349
+        capabilities.getCapabilityNames().stream().filter(x -> {
+            return !(headless && CapabilityType.LOGGING_PREFS.equals(x));
+        }).forEach(x -> {
+            options.setCapability(x, capabilities.getCapability(x));
+        });
+        
         return options;
 
     }
+
+
 }
