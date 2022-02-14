@@ -100,7 +100,7 @@ public class Backend implements Closeable {
                 service.start();
 
                 return service;
-            } catch (SessionNotCreatedException e) {
+            } catch (WebDriverException e) {
                 log.warn("Exception while connecting to grid", e);
                 exception = e;
             }
