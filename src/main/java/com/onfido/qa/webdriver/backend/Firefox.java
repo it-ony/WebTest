@@ -22,6 +22,7 @@ public class Firefox implements BrowserFactory {
         var options = new FirefoxOptions();
 
         options.setAcceptInsecureCerts(config.acceptInsecureCertificates);
+        options.setCapability("acceptSslCert", config.acceptInsecureCertificates);
 
         if (config.enableMicrophoneCameraAccess) {
             options.addPreference("media.navigator.streams.fake", true);
@@ -30,10 +31,6 @@ public class Firefox implements BrowserFactory {
 
         var headless = Boolean.parseBoolean(properties.getProperty("headless", "false"));
         options.setHeadless(headless);
-
-        if (!headless) {
-            return options;
-        }
 
         // do not copy logging preferences, if running in headless mode: https://github.com/SeleniumHQ/selenium/issues/10349
         capabilities.getCapabilityNames().stream().filter(x -> {
