@@ -22,7 +22,7 @@ Create a new mvn project and the following to your pom.xml
     <repositories>
         <repository>
             <id>github-public</id>
-            <url>https://public:&#103;hp_T4mRAMhpfaCBfjmp7zRAG1OvRwSa2p20dv6P@maven.pkg.github.com/it-ony/webtest
+            <url>https://public:&#103;hp_ikHTOjIdGySy0JoNczPoYdanZp7Fqy0MiUIL@maven.pkg.github.com/it-ony/webtest
             </url>
         </repository>
     </repositories>
