@@ -16,6 +16,7 @@ public class ChromeDriver implements DriverServiceFactory {
     public DriverService createDriverService(Properties properties, boolean forceLog) {
 
         var browserPath = properties.getProperty("browserPath");
+        var chromeDriverPath = properties.getProperty("chromeDriverPath");
 
         var builder = new ChromeDriverService
                 .Builder()
@@ -32,7 +33,9 @@ public class ChromeDriver implements DriverServiceFactory {
                    .withLogFile(new File(dir, UUID.randomUUID() + ".log"));
         }
 
-        if (!isEmpty(browserPath)) {
+        if (!isEmpty(chromeDriverPath)) {
+            builder.usingDriverExecutable(new File(chromeDriverPath));
+        } else if (!isEmpty(browserPath)) {
             builder.usingDriverExecutable(new File(browserPath));
         }
 
