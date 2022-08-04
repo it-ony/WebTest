@@ -1,5 +1,6 @@
 package com.onfido.qa.webdriver.backend;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriverLogLevel;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.service.DriverService;
@@ -8,15 +9,11 @@ import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 public class ChromeDriver implements DriverServiceFactory {
 
     @Override
     public DriverService createDriverService(Properties properties, boolean forceLog) {
-
-        var browserPath = properties.getProperty("browserPath");
-        var chromeDriverPath = properties.getProperty("chromeDriverPath");
+        WebDriverManager.chromedriver().setup();
 
         var builder = new ChromeDriverService
                 .Builder()
@@ -33,13 +30,6 @@ public class ChromeDriver implements DriverServiceFactory {
                    .withLogFile(new File(dir, UUID.randomUUID() + ".log"));
         }
 
-        if (!isEmpty(chromeDriverPath)) {
-            builder.usingDriverExecutable(new File(chromeDriverPath));
-        } else if (!isEmpty(browserPath)) {
-            builder.usingDriverExecutable(new File(browserPath));
-        }
-
         return builder.build();
-
     }
 }

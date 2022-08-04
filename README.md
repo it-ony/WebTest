@@ -31,7 +31,7 @@ Create a new mvn project and the following to your pom.xml
         <dependency>
             <groupId>com.onfido.qa.webdriver</groupId>
             <artifactId>webtest</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -47,18 +47,15 @@ Create a new mvn project and the following to your pom.xml
 Create your first test class in the `src/test/java` directory named `<MyTest>IT.java`.
 
 ```java
-public class GithubIT extends WebTest  {
+public class GithubIT extends WebTest {
 
-    public class FooIT extends WebTest {
+    @Test()
+    public void testGithubCodeSearch() {
+        driver().get("https://github.com/");
 
-        @Test()
-        public void testGithubCodeSearch() {
-            driver().get("https://github.com/");
-
-            verifyPage(GithubMainPage.class)
-                    .search("it-ony/webtest")
-                    .clickFirstResult();
-        }
+        verifyPage(GithubMainPage.class)
+                .search("it-ony/webtest")
+                .clickFirstResult();
     }
 }
 ```
@@ -67,7 +64,7 @@ and create the PageObjects that we want to use. The PageObject needs to extend f
 overwrite the `verifyPage` method. By doing we can make sure that we landed on the correct page.
 
 ```java
-public static class GithubMainPage extends Page {
+public class GithubMainPage extends Page {
 
     public static final By SEARCH = By.cssSelector(".header-search-input");
 
@@ -90,7 +87,7 @@ public static class GithubMainPage extends Page {
 ```
 
 ```java
-public static class GithubSearchPage extends Page {
+public class GithubSearchPage extends Page {
 
     public static final By CODE_SEARCH_RESULTS = By.cssSelector(".codesearch-results");
 

@@ -1,0 +1,28 @@
+name: pull-request
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Initialize containers
+        run: docker-compose -f docker-compose.grid.yml up -d
+
+      - name: Check available containers
+        run: docker ps
+
+      - name: Tests
+        run: |
+          mvn -B clean test -Dtest=GithubIT
