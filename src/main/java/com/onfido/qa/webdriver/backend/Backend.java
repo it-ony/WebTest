@@ -200,6 +200,7 @@ public class Backend implements Closeable {
             var map = new HashMap<String, String>();
             map.put("key", accessKey);
             map.put("localIdentifier", id);
+            map.put("binarypath", System.getenv("BROWSERSTACK_LOCAL_BINARY"));
 
             local = new Local();
             local.start(map);
