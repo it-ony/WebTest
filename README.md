@@ -180,7 +180,11 @@ Just define `browserstack.username` and `browserstack.accessKey` as system prope
 `BROWSERSTACK_ACCESS_KEY` as environment variables.
                              
 If you need to your local system from browserstack set the property `browserstack.local=true` and it will create a tunnel
-between browserstack and your system executing the tests. 
+between browserstack and your system executing the tests.
+
+If you need test resource files to use on browserstack (e.g. videos for camera injection) define `browserstack.localFolder`
+as system property or `BROWSERSTACK_LOCAL_FOLDER` as environment variable with the path to the files. The files will be
+available to download during the BrowserStack session at `http://${browserstack.username}.browserstack.com/`.
 
 The `BrowserStackListener` takes care of setting the test results. To make use of it annotate your test class 
 
@@ -266,6 +270,12 @@ To emulate a mobile device use the `@Mobile` annotation. You can define the `wid
 
 Mobile emulation is only available on chrome (and most likely on edge).
 
+# Camera Injection
+
+To use fake audio or video streams, set the property `filePathForFakeCapture` with path to fake stream files.  
+Additionally, on `@Browser` annotation:
+* Set `enableMicrophoneCameraAccess` to `true`
+* Set `fileForFakeAudioCapture` or `fileForFakeVideoCapture` to the filename
 # Switch easily between environments
 
 A best practice is to run your tests against local and testing them before the commit against a remote grid that your CI system 

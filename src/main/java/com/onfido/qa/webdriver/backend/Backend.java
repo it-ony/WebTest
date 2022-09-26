@@ -179,6 +179,7 @@ public class Backend implements Closeable {
 
         var username = properties.getProperty("browserstack.username", System.getenv("BROWSERSTACK_USERNAME"));
         var accessKey = properties.getProperty("browserstack.accessKey", System.getenv("BROWSERSTACK_ACCESS_KEY"));
+        var localFolder = properties.getProperty("browserstack.localFolder", System.getenv("BROWSERSTACK_LOCAL_FOLDER"));
 
         var enableLocalTesting = parseBoolean(Optional.ofNullable(properties.getProperty("browserstack.local", System.getenv("BROWSERSTACK_LOCAL")))
                                                       .orElse("false"));
@@ -201,6 +202,9 @@ public class Backend implements Closeable {
             map.put("key", accessKey);
             map.put("localIdentifier", id);
             map.put("binarypath", System.getenv("BROWSERSTACK_LOCAL_BINARY"));
+            if (localFolder != null) {
+                map.put("f", localFolder);
+            }
 
             local = new Local();
             local.start(map);

@@ -30,6 +30,7 @@ class Chrome implements BrowserFactory {
     @Override
     public MutableCapabilities getOptions(DesiredCapabilities capabilities, Config config, Properties properties) {
         var chromeOptions = new ChromeOptions();
+        var filePathForFakeCapture = properties.getProperty("filePathForFakeCapture", "./");
 
         chromeOptions.setAcceptInsecureCerts(config.acceptInsecureCertificates);
 
@@ -40,11 +41,11 @@ class Chrome implements BrowserFactory {
             chromeOptions.addArguments("--use-fake-ui-for-media-stream");
 
             if (!isEmpty(config.fileForFakeAudioCapture)) {
-                chromeOptions.addArguments("--use-file-for-fake-audio-capture=" + getCanonicalPath(config.fileForFakeAudioCapture));
+                chromeOptions.addArguments("--use-file-for-fake-audio-capture=" + getCanonicalPath(filePathForFakeCapture + config.fileForFakeAudioCapture));
             }
 
             if (!isEmpty(config.fileForFakeVideoCapture)) {
-                chromeOptions.addArguments("--use-file-for-fake-video-capture=" + getCanonicalPath(config.fileForFakeVideoCapture));
+                chromeOptions.addArguments("--use-file-for-fake-video-capture=" + getCanonicalPath(filePathForFakeCapture + config.fileForFakeVideoCapture));
             }
         }
 
@@ -60,12 +61,22 @@ class Chrome implements BrowserFactory {
         return chromeOptions.merge(capabilities);
     }
 
-    private String getCanonicalPath(String config) {
+    private String getCanonicalPath(String filePath) {
         try {
-            return new File(config).getCanonicalPath();
+            return isWindowsPath(filePath) ? new File(filePath).getPath() : new File(filePath).getCanonicalPath();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isWindowsPath(String filePath) {
+        return  filePath.matches(
+                "([a-zA-Z]:|\\\\)" +
+                "(\\\\[^<>:\"/\\\\|?*\u0000-\u001f]+)+")
+                &&
+                !filePath.matches(
+                "(|.*\\\\)(?i:con|prn|aux|nul|com[1-9]|lpt[1-9])" +
+                "(\\.[^.]*)?");
     }
 
     protected void setupMobileDevice(ChromeOptions chromeOptions, Config config) {
