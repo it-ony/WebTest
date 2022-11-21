@@ -35,7 +35,7 @@ class Chrome implements BrowserFactory {
         chromeOptions.setAcceptInsecureCerts(config.acceptInsecureCertificates);
 
         chromeOptions.setHeadless(Boolean.parseBoolean(properties.getProperty("headless", "false")));
-        
+
         if (config.enableMicrophoneCameraAccess) {
             chromeOptions.addArguments("--use-fake-device-for-media-stream");
             chromeOptions.addArguments("--use-fake-ui-for-media-stream");
@@ -54,7 +54,7 @@ class Chrome implements BrowserFactory {
             if (!config.allowMobileEmulation()) {
                 throw new RuntimeException("Mobile emulation is not allowed.");
             }
-            
+
             setupMobileDevice(chromeOptions, config);
         }
 
@@ -89,7 +89,7 @@ class Chrome implements BrowserFactory {
 
         var mobileEmulation = new HashMap<String, Object>();
         mobileEmulation.put("deviceMetrics", deviceMetrics);
-        mobileEmulation.put("userAgent", "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19");
+        mobileEmulation.put("userAgent", "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36");
 
         chromeOptions.setExperimentalOption("mobileEmulation", mobileEmulation);
     }
