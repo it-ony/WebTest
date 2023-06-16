@@ -32,7 +32,7 @@ class Chrome implements BrowserFactory {
         var chromeOptions = new ChromeOptions();
         var filePathForFakeCapture = properties.getProperty("filePathForFakeCapture", "./");
 
-        boolean allowOrigins = Boolean.parseBoolean(properties.getProperty("allowOrigins", "false"));
+        boolean allowOrigins = Boolean.parseBoolean(properties.getProperty("remoteAllowOrigins", "false"));
         if (allowOrigins){
             chromeOptions.addArguments("--remote-allow-origins=*");
         }
